@@ -4,7 +4,6 @@
 Dream Team - Predicting Fantasy Football Weekly Projections
 
 ### Team Member Names
-Jaylen Keith (jck249)
 Darren Chang (dwc236)
 Zach Schaffer (zjs5)
 Jack Vaughan
