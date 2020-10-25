@@ -8,7 +8,7 @@ setwd("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly\\
 temp <- list.files(pattern="*.csv", recursive = T)
 weekly_ff <- lapply(temp, vroom)
 weekly_ff <- weekly_ff %>% 
-            bind_rows(.id = "column_label")
+                bind_rows(.id = "column_label")
 # wk1_2019 <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly\\2019\\week1.csv")
 
 games_2019 <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\nflscrapR-data\\games_data\\regular_season\\reg_games_2019.csv")
@@ -40,9 +40,9 @@ games_2019 <- games_2019 %>%
 
 games_2019_concat <- games_2019 %>% 
                         bind_rows((games_2019 %>% rename(team2 = team1,
-                            team1 = team2,
-                            team2_score = team1_score,
-                            team1_score = team2_score)))
+                                team1 = team2,
+                                team2_score = team1_score,
+                                team1_score = team2_score)))
 
 # wk1_2019 <- wk1_2019 %>%
 #                 mutate(Tm = as.factor(Tm)) %>%
