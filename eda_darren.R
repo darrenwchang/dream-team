@@ -5,6 +5,7 @@
 library(nflfastR)
 library(tidyverse)
 library(vroom)
+library(gtools)
 
 seasons <- c(seq("2009", "2019", by = 1))
 
@@ -13,6 +14,7 @@ scrape_weekly_nfl <- function(seasons, path_weekly, path_games) {
         for (i in seasons){
         setwd(paste0(path_weekly, "\\",i))
         temp <- list.files(pattern="*.csv", recursive = T)
+        temp <- mixedsort(sort(temp))
         weekly_ff <- lapply(temp, vroom)
 
         weekly_ff <- weekly_ff %>% 
@@ -112,6 +114,18 @@ scrape_weekly_nfl <- function(seasons, path_weekly, path_games) {
 # test_wk1 <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly\\2009\\week1.csv")
 # levels(as.factor(test_wk1$Tm))
 
+
+# setwd(paste0("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly",
+#                 "\\", "2009"))
+# temp <- list.files(pattern="*.csv", recursive = T)
+# temp <- mixedsort(sort(temp))
+
+# # install.packages("gtools", dependencies = TRUE, INSTALL_opts = '--no-lock')
+# weekly_ff <- lapply(temp, vroom)
+
+# weekly_ff <- weekly_ff %>% 
+#         bind_rows(.id = "column_label")
+
 scrape_weekly_nfl(seasons, 
                 "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly",
                 "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\nflscrapR-data\\games_data\\regular_season")
@@ -142,6 +156,15 @@ corrplot(weekly.cor,
         type = "lower")
 
 dev.off()
+
+# weekly_ff
+
+hist(filter(weekly_ff, PassingYds_prev !=0)$PassingYds_prev,
+        breaks = 30,
+        col = "blue",
+        xlab = "Previous Week Passing Yards",
+        main = ""
+        )
 
 # standings <- read_csv("http://www.habitatring.com/standings.csv")
 # games <- read_csv("http://www.habitatring.com/games.csv")
