@@ -18,21 +18,25 @@ scrape_weekly_nfl <- function(seasons, path_weekly, path_games) {
         weekly_ff <- weekly_ff %>% 
                 bind_rows(.id = "column_label")
 
-        games <- vroom(paste0(path_games, "\\", paste0("reg_games_", i, ".csv")), )
+        games <- vroom(paste0(path_games, "\\", paste0("reg_games_", i, ".csv")))
         games <- games %>%
                 mutate(home_team = case_when(home_team == "GB" ~ "GNB",
                                 home_team == "KC" ~ "KAN",
+                                home_team == "JAC" ~ "JAX",
                                 home_team == "LA" ~ "LAR",
                                 home_team == "NO" ~ "NOR",
                                 home_team == "NE" ~ "NWE",
+                                home_team == "SD" ~ "SDG",
                                 home_team == "SF" ~ "SFO",
                                 home_team == "TB" ~ "TAM",
                                 TRUE ~ home_team)) %>%
                 mutate(away_team = case_when(away_team == "GB" ~ "GNB",
                                 away_team == "KC" ~ "KAN",
+                                away_team == "JAC" ~ "JAX",
                                 away_team == "LA" ~ "LAR",
                                 away_team == "NO" ~ "NOR",
                                 away_team == "NE" ~ "NWE",
+                                away_team == "SD" ~ "SDG",
                                 away_team == "SF" ~ "SFO",
                                 away_team == "TB" ~ "TAM",
                                 TRUE ~ away_team)) %>% 
@@ -102,6 +106,12 @@ scrape_weekly_nfl <- function(seasons, path_weekly, path_games) {
         }
 }
 
+# test <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\nflscrapR-data\\games_data\\regular_season\\reg_games_2009.csv")
+# levels(as.factor(test$home_team))
+
+# test_wk1 <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly\\2009\\week1.csv")
+# levels(as.factor(test_wk1$Tm))
+
 scrape_weekly_nfl(seasons, 
                 "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly",
                 "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\nflscrapR-data\\games_data\\regular_season")
@@ -114,106 +124,24 @@ vroom_write(weekly_ff,
                 path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\weekly_ff.csv",
                 delim = ",")
 
+## -- EDA
+setwd("C:/Users/darre/Documents/_cornell 20-21/orie 4741/dream-team")
+weekly.cor <- cor(select(Filter(is.numeric, weekly_ff), -c(season, game_id, week)))
 
+#install.packages("corrplot", dependencies = TRUE, INSTALL_opts = '--no-lock')
+library(corrplot)
 
-## -- OLD CODE
+png(height=900, width=900, file="weekly.png", type = "cairo")
+corrplot(weekly.cor,
+        title = "Correlation between Features",
+        method = "color",
+        order = "FPC",
+        # tl.pos = "td", 
+        tl.cex = 0.5,
+        diag = F,
+        type = "lower")
+
+dev.off()
 
 # standings <- read_csv("http://www.habitatring.com/standings.csv")
 # games <- read_csv("http://www.habitatring.com/games.csv")
-
-# setwd("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly\\2019")
-
-# temp <- list.files(pattern="*.csv", recursive = T)
-# weekly_ff <- lapply(temp, vroom)
-# weekly_ff <- weekly_ff %>% 
-#                 bind_rows(.id = "column_label")
-# # wk1_2019 <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\data_v2\\weekly\\2019\\week1.csv")
-
-# games_2019 <- vroom("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\nflscrapR-data\\games_data\\regular_season\\reg_games_2019.csv")
-
-# games_2019 <- games_2019 %>%
-#                 mutate(home_team = case_when(home_team == "GB" ~ "GNB",
-#                                 home_team == "KC" ~ "KAN",
-#                                 home_team == "LA" ~ "LAR",
-#                                 home_team == "NO" ~ "NOR",
-#                                 home_team == "NE" ~ "NWE",
-#                                 home_team == "SF" ~ "SFO",
-#                                 home_team == "TB" ~ "TAM",
-#                                 TRUE ~ home_team)) %>%
-#                 mutate(away_team = case_when(away_team == "GB" ~ "GNB",
-#                                 away_team == "KC" ~ "KAN",
-#                                 away_team == "LA" ~ "LAR",
-#                                 away_team == "NO" ~ "NOR",
-#                                 away_team == "NE" ~ "NWE",
-#                                 away_team == "SF" ~ "SFO",
-#                                 away_team == "TB" ~ "TAM",
-#                                 TRUE ~ away_team)) %>%
-#                 rename(team1 = home_team,
-#                         team2 = away_team,
-#                         team1_score = home_score,
-#                         team2_score = away_score) %>% 
-#                 mutate(team1 = as.factor(team1),
-#                         team2 = as.factor(team2)) %>% 
-#                 select(-c(game_url, state_of_game))
-
-# games_2019_concat <- games_2019 %>% 
-#                         bind_rows((games_2019 %>% rename(team2 = team1,
-#                                 team1 = team2,
-#                                 team2_score = team1_score,
-#                                 team1_score = team2_score)))
-
-# # wk1_2019 <- wk1_2019 %>%
-# #                 mutate(Tm = as.factor(Tm)) %>%
-# #                 rename(team1 = Tm) %>% 
-# #                 left_join((games_2019_concat %>% filter(week == 1)), 
-# #                     by = c("team1" = "team1"))
-
-# weekly_ff_2 <- weekly_ff %>%
-#                 mutate(Tm = as.factor(Tm),
-#                         column_label = as.numeric(column_label)) %>%
-#                 rename(team1 = Tm,
-#                     week = column_label) %>% 
-#                 left_join(games_2019_concat, 
-#                     by = c("team1" = "team1", 
-#                     "week" = "week"))
-
-# weekly_ff_3 <- weekly_ff_2 %>% 
-#     group_by(Player) %>% 
-#     mutate(across(.cols = -c(week,
-#                     Pos, 
-#                     team1, 
-#                     PPRFantasyPoints, 
-#                     StandardFantasyPoints,
-#                     HalfPPRFantasyPoints,
-#                     type,
-#                     game_id,
-#                     team2,
-#                     season),
-#             cummean,
-#             .names = "{col}_cum"),
-#         across(.cols = -c(week,
-#                     Pos, 
-#                     team1, 
-#                     PPRFantasyPoints, 
-#                     StandardFantasyPoints,
-#                     HalfPPRFantasyPoints,
-#                     type,
-#                     game_id,
-#                     team2,
-#                     season,
-#                     ends_with("_cum")),
-#             lag,
-#             n = 1L,
-#             .names = "{col}_prev"),
-#         across(.cols = -c(week,
-#                     Pos, 
-#                     team1, 
-#                     PPRFantasyPoints, 
-#                     StandardFantasyPoints,
-#                     HalfPPRFantasyPoints,
-#                     type,
-#                     game_id,
-#                     team2,
-#                     season),
-#             replace_na,
-#             0)) 
