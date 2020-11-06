@@ -13,7 +13,12 @@ setwd("C:/Users/darre/Documents/_cornell 20-21/orie 4741/dream-team")
 
 # -- import data
 weekly_ff <- vroom("weekly_ff.csv")
-weekly.cor <- cor(select(Filter(is.numeric, weekly_ff), -c(season, game_id, week)))
+weekly.cor <- cor(select(Filter(is.numeric, weekly_ff), 
+        -c(season, game_id, week, StandardFantasyPoints,
+        HalfPPRFantasyPoints,
+        PPRFantasyPoints,
+        ends_with("_cum"),
+        ends_with("_prev"))))
 
 # -- correlation plot
 png(height=1100, width=1100, file="weekly.png", type = "cairo")
@@ -22,7 +27,7 @@ corrplot(weekly.cor,
         method = "color",
         order = "FPC",
         # tl.pos = "td", 
-        tl.cex = 1,
+        # tl.cex = 1,
         diag = F,
         type = "lower")
 
