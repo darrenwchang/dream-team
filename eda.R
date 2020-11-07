@@ -28,6 +28,27 @@ corrplot(weekly.cor,
         order = "FPC",
         # tl.pos = "td", 
         # tl.cex = 1,
+        tl.cex = 2,
+        diag = F,
+        type = "lower")
+
+dev.off()
+
+## -- full correlation plot
+weekly.cor_full <- cor(select(Filter(is.numeric, weekly_ff), 
+        -c(season, game_id, week, StandardFantasyPoints,
+        HalfPPRFantasyPoints,
+        PPRFantasyPoints)))
+
+# -- correlation plot
+png(height=1100, width=1100, file="weekly_full.png", type = "cairo")
+corrplot(weekly.cor_full,
+        # title = "Correlation between Features",
+        method = "color",
+        order = "FPC",
+        # tl.pos = "td", 
+        tl.cex = 0.5,
+        # tl.cex = 2,
         diag = F,
         type = "lower")
 
