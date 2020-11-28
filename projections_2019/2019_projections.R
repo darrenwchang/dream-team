@@ -31,14 +31,28 @@ season <- season %>%
             mutate(diff_espn = Actual - Proj,
                     diff_orie = Actual - std_points_pred)
 
-hi_espn <- hist(season$diff_espn, breaks = 40)
-hi_orie <- hist(season$diff_orie, breaks = 40)
+hi_espn <- hist(season$diff_espn, breaks = 40,
+        xlab  = "Difference from Actual (Points)",
+        main  = "Histogram of 2019 NFL Season Fantasy Projections")
+hi_orie <- hist(season$diff_orie, breaks = 40,
+        xlab  = "Difference from Actual (Points)",
+        main = "Histogram of 2019 NFL Season Fantasy Projections")
 
-c1 <- rgb(173,216,230,max = 255, alpha = 80, names = "lt.blue")
-c2 <- rgb(255,192,203, max = 255, alpha = 80, names = "lt.pink")
+c1 <- adjustcolor("#30a2da", alpha.f = 0.5)
+c2 <- adjustcolor("#fc4f30", alpha.f = 0.5)
 
-plot(hi_espn, col = c1)
+png(height = 500, width = 500, file = "espn_2019_hist.png", type = "cairo")
+
+plot(hi_espn, col = c1,
+    xlab  = "Difference from Actual (Points)",
+    main = "Histogram of 2019 NFL Season Fantasy Projection Accuracy")
 plot(hi_orie, add = T, col = c2)
+legend(20, 100, legend = c("ESPN", "Dream Team"),
+        col = c("#30a2da", "#fc4f30"),
+        title = "Projection",
+        lty = 1)
+
+dev.off()
 
 sum(abs(season$diff_espn), na.rm = T) #11672.51
 sum(abs(season$diff_orie), na.rm = T) #10843.9
@@ -54,7 +68,23 @@ season_stats <- season %>%
 
 season_stats
 
+
+theme_set(theme_bw())
+theme_update(text = element_text(size=12),
+panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(),
+strip.background = element_blank()
+)
+
+png(height=428, width=534, file="espn_2019.png", type = "cairo")
 ggplot(data = season_stats,
         mapping = aes(x = Week)) +
-        geom_line(aes(y = sum_abs_e)) +
-        geom_line(aes(y = sum_abs_o))
+        geom_line(aes(y = sum_abs_e, color = "blue"), size = 1.2) +
+        geom_line(aes(y = sum_abs_o, color = "red"), size = 1.2) +
+        scale_color_manual(name = "Projection",
+        values = c("blue" = "#30a2da", "red" = "#fc4f30"),
+        labels = c("ESPN", "Dream Team")) +
+        labs(title = "2019 NFL Season Fantasy Projections") +
+        ylab("Sum of Absolute Difference from Actual (Points)") +
+        scale_x_continuous(breaks = seq(1, 16, 1))
+dev.off()
