@@ -20,10 +20,10 @@ proj <- proj %>%
         filter(season == 2019) %>% 
         select(-season)
 
-proj$std_lm[proj$std_lm < 0] <- 0 # 0 for nonnegative values
-proj$std_lm <- round(proj$std_lm) # round
-proj$std_lasso[proj$std_lasso < 0] <- 0
-proj$std_lasso <- round(proj$std_lasso)
+# proj$std_lm[proj$std_lm < 0] <- 0 # 0 for nonnegative values
+# proj$std_lm <- round(proj$std_lm) # round
+# proj$std_lasso[proj$std_lasso < 0] <- 0
+# proj$std_lasso <- round(proj$std_lasso)
 
 season <- data %>%
             inner_join(proj, by = c("Player", "Week")) %>% 
@@ -115,8 +115,8 @@ dev.off()
 
 
 sum(abs(season$diff_espn), na.rm = T) #11672.51
-sum(abs(season$diff_lm), na.rm = T) #10843.9
-sum(abs(season$diff_lasso), na.rm = T) #10838.82
+sum(abs(season$diff_lm), na.rm = T) #10825.18
+sum(abs(season$diff_lasso), na.rm = T) #10824.9
 
 season_stats <- season %>% 
     group_by(Week) %>% 

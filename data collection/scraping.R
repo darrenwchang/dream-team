@@ -135,7 +135,7 @@ seasons_ff <- paste0("weekly_ff", seasons)
 weekly_ff <- bind_rows(mget(seasons_ff))
 
 vroom_write(weekly_ff,
-                path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\weekly_ff.csv",
+                path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff.csv",
                 delim = ",")
                 
 # standings <- read_csv("http://www.habitatring.com/standings.csv")

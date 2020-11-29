@@ -9,7 +9,7 @@ library(vroom)
 #install.packages("corrplot", dependencies = TRUE, INSTALL_opts = '--no-lock')
 library(corrplot)
 
-setwd("C:/Users/darre/Documents/_cornell 20-21/orie 4741/dream-team")
+setwd("C:/Users/darre/Documents/_cornell 20-21/orie 4741/dream-team/data collection")
 
 # -- import data
 weekly_ff <- vroom("weekly_ff.csv")
@@ -19,6 +19,8 @@ weekly.cor <- cor(select(Filter(is.numeric, weekly_ff),
         PPRFantasyPoints,
         ends_with("_cum"),
         ends_with("_prev"))))
+
+setwd("C:/Users/darre/Documents/_cornell 20-21/orie 4741/dream-team/eda")
 
 # -- correlation plot
 png(height=1100, width=1100, file="weekly.png", type = "cairo")
