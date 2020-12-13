@@ -91,6 +91,7 @@ scrape_weekly_nfl <- function(seasons, path_weekly, path_games) {
                         lag,
                         n = 1L,
                         .names = "{col}_prev"),
+                        across(.cols = ends_with("_cum"), lag, n = 1L),
                         across(.cols = -c(week,
                                 Pos, 
                                 team1, 
@@ -103,6 +104,8 @@ scrape_weekly_nfl <- function(seasons, path_weekly, path_games) {
                                 season),
                         replace_na,
                         0)) 
+                        # %>% 
+                # mutate(across(.cols = ends_with("_cum"), lag, n = 1L))
         assign(paste0("weekly_ff", i), weekly_ff,
                         envir = .GlobalEnv)
         }
@@ -121,6 +124,13 @@ scrape_weekly_nfl(seasons,
 seasons_ff <- paste0("weekly_ff", seasons)
 
 weekly_ff <- bind_rows(mget(seasons_ff))
+
+weekly_ff <- weekly_ff %>% 
+        filter(Pos %in% c("QB", "RB", "TE", "WR", "FB", "HB", "FB/RB", "K", "WR-K", "WR-R", "WR W", "WR/K", "WR/P", "WR/PR", "WR")) %>% 
+        mutate(Pos = case_when(Pos %in% c("WR-K", "WR-R", "WR W", "WR/K", "WR/P", "WR/PR", "WR") ~ "WR",
+                                TRUE ~ Pos),
+                Pos = case_when(Pos %in% c("RB", "FB", "HB", "FB/RB") ~ "RB",
+                                TRUE ~ Pos))
 
 vroom_write(weekly_ff,
                 path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff.csv",

@@ -13,7 +13,7 @@ data <- data %>%
         select(-c(...1, Team)) %>% 
         rename(Pos_FF = Pos)
 
-proj <- vroom("points_proj.csv")
+proj <- vroom("points_proj_impute.csv")
 
 proj <- proj %>% 
         rename(Week = week) %>% 
@@ -36,15 +36,22 @@ season <- season %>%
                 diff_lasso = Actual - std_lasso)
 
 # -- draw histograms for errors
-hi_espn <- hist(season$diff_espn, breaks = 40,
+hi_espn <- hist(season$diff_espn, 
+        breaks = 40,
         xlab  = "Difference from Actual (Points)",
         main  = "Histogram of 2019 NFL Season Fantasy Projections")
-hi_orie_ols <- hist(season$diff_lm, breaks = 40,
+hi_orie_ols <- hist(season$diff_lm, 
+        breaks = 40,
         xlab  = "Difference from Actual (Points)",
         main = "Histogram of 2019 NFL Season Fantasy Projections")
-hi_orie_lasso <- hist(season$diff_lasso, breaks = 40,
+hi_orie_lasso <- hist(season$diff_lasso, 
+        breaks = 40,
         xlab  = "Difference from Actual (Points)",
         main = "Histogram of 2019 NFL Season Fantasy Projections")
+
+den_espn <- plot(density(season$diff_espn))
+den_orie_ols <- plot(density(season$diff_lm))
+den_orie_lasso <- plot(density(season$diff_lasso))
 
 c1 <- adjustcolor("#30a2da", alpha.f = 0.5)
 c2 <- adjustcolor("#fc4f30", alpha.f = 0.5)
@@ -82,36 +89,54 @@ c3 <- adjustcolor("#6d904f", alpha.f = 0.5)
 
 # dev.off()
 
-## put the plots together on one
-png(height = 500, width = 1000, file = "hist_2019_combined.png",
+## put density together on one
+png(height = 500, width = 1000, file = "hist_2019_density.png",
         type = "cairo")
-par(mfcol=c(1,2))
-plot(hi_espn, col = c1,
-    xlab  = "Difference from Actual (Points)",
-    main = "")
-    #main = "Histogram of 2019 NFL Season Fantasy Projection Accuracy")
-plot(hi_orie_ols, add = T, col = c2)
-# plot(hi_orie_lasso, add = T, col = c3)
-legend(15, 100, legend = c("ESPN", "OLS"),
+plot(density(season$diff_espn), col = c1, main = "", axes = F, sub = "", xlab = "")
+par(new = T)
+plot(density(season$diff_lm), col = c2, main = "", axes = F, sub = "", xlab = "")
+par(new = T)
+plot(density(season$diff_lasso), col = c3, main = "", xlab  = "Difference from Actual (Points)")
+legend(15, 0.05, legend = c("ESPN", "OLS", "Lasso"),
 #, "Dream Team Lasso"),
-        col = c("#30a2da", "#fc4f30"), 
-#"#6d904f"),
-        title = "Projection",
-        lty = 1)
-plot(hi_espn, col = c1,
-    xlab  = "Difference from Actual (Points)",
-    main = "")
-    #,
-    #main = "Histogram of 2019 NFL Season Fantasy Projection Accuracy")
-plot(hi_orie_lasso, add = T, col = c3)
-# plot(hi_orie_lasso, add = T, col = c3)
-legend(15, 100, legend = c("ESPN", "Lasso"),
-#, "Dream Team Lasso"),
-        col = c("#30a2da", "#6d904f"), 
+        col = c("#30a2da", "#fc4f30", "#6d904f"), 
 #"#6d904f"),
         title = "Projection",
         lty = 1)
 dev.off()
+
+
+
+# ## put histograms together on one
+# png(height = 500, width = 1000, file = "hist_2019_combined.png",
+#         type = "cairo")
+# par(mfcol=c(1,2))
+# plot(hi_espn, col = c1,
+#     xlab  = "Difference from Actual (Points)",
+#     main = "")
+#     #main = "Histogram of 2019 NFL Season Fantasy Projection Accuracy")
+# plot(hi_orie_ols, add = T, col = c2)
+# # plot(hi_orie_lasso, add = T, col = c3)
+# legend(15, 100, legend = c("ESPN", "OLS"),
+# #, "Dream Team Lasso"),
+#         col = c("#30a2da", "#fc4f30"), 
+# #"#6d904f"),
+#         title = "Projection",
+#         lty = 1)
+# plot(hi_espn, col = c1,
+#     xlab  = "Difference from Actual (Points)",
+#     main = "")
+#     #,
+#     #main = "Histogram of 2019 NFL Season Fantasy Projection Accuracy")
+# plot(hi_orie_lasso, add = T, col = c3)
+# # plot(hi_orie_lasso, add = T, col = c3)
+# legend(15, 100, legend = c("ESPN", "Lasso"),
+# #, "Dream Team Lasso"),
+#         col = c("#30a2da", "#6d904f"), 
+# #"#6d904f"),
+#         title = "Projection",
+#         lty = 1)
+# dev.off()
 
 
 sum(abs(season$diff_espn), na.rm = T) #11672.51
