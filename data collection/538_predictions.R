@@ -59,7 +59,6 @@ pred_538_clean <- pred_538_clean %>%
 pred_538 %>% filter(team1 == "LAC", season == 2009)
 levels(as.factor(filter(pred_538_clean, season > 2009)$team1))
 
-
 ## -- Add to original data\
 setwd("C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection")
 weekly_ff <- vroom("weekly_ff.csv")
@@ -95,15 +94,26 @@ weekly_ff_elo <- weekly_ff_elo %>%
                             team1_score_prev = case_when(week == 1 ~ NA_real_, TRUE ~ team1_score_prev),
                             team2_score_prev = case_when(week == 1 ~ NA_real_, TRUE ~ team2_score_prev))
 
-vroom_write(weekly_ff_elo,
-                path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff_impute.csv",
-                delim = ",")
+
+# vroom_write(weekly_ff_elo,
+#                 path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff_impute.csv",
+#                 delim = ",")
 
 sum(is.na(weekly_ff_elo))
 
+library(naniar)
+
+theme_set(theme_bw())
+theme_update(text = element_text(size=12),
+panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(),
+strip.background = element_blank()
+)
 
 
-# # View(weekly_ff_elo)
+png(height = 500, width = 500, file = "missing.png")
+vis_miss(weekly_ff_elo[25:30])
+dev.off()
 
 # # library(mice)
 # # library(VIM)    
@@ -129,13 +139,14 @@ ff.glrm <- h2o.glrm(training_frame = ff.hex,
                     cols = 25:ncol(ff.hex), 
                     k = 5, 
                     loss = "Quadratic", 
-                    # init = "SVD", 
-                    # svd_method = "GramSVD",
+                    init = "SVD", 
+                    svd_method = "GramSVD",
                     regularization_x = "None", 
                     regularization_y = "None", 
-                    max_iterations = 2000,
-                    max_updates = 6000, 
+                    max_iterations = 1000,
+                    max_updates = 2000, 
                     min_step_size = 1e-6, 
+                    transform = "STANDARDIZE",
                     seed = 0)
 summary(ff.glrm)
 plot(ff.glrm)
@@ -201,7 +212,25 @@ ff.glrm_2 <- h2o.glrm(training_frame = ff.hex,
                     # transform = "STANDARDIZE",
                     seed = 0)
 summary(ff.glrm_2)
+
+png(height = 500, width = 750, file = "glrm_convergence.png", 
+    type = "cairo")
 plot(ff.glrm_2)
+dev.off()
+
+p3 <- t(ff.glrm_2@model$archetypes) %>% 
+  as.data.frame() %>% 
+  mutate(feature = row.names(.)) %>%
+  ggplot(aes(Arch1, reorder(feature, Arch1))) +
+  geom_point()
+
+p4 <- t(ff.glrm_2@model$archetypes) %>% 
+  as.data.frame() %>% 
+  mutate(feature = row.names(.)) %>%
+  ggplot(aes(Arch1, Arch2, label = feature)) +
+  geom_text()
+
+gridExtra::grid.arrange(p3, p4, nrow = 1)
 
 ff_pred_2 <- as_tibble(predict(ff.glrm_2, ff.hex))
 # ff.hex[is.na(ff.hex)] <- ff.pred[is.na(ff.hex)]
@@ -291,6 +320,6 @@ ff_hex_impute <- ff_hex %>%
 #                 path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff_elo.csv",
 #                 delim = ",")
 
-vroom_write(ff_hex_impute,
-                path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff_elo_impute.csv",
-                delim = ",")
+# vroom_write(ff_hex_impute,
+#                 path = "C:\\Users\\darre\\Documents\\_cornell 20-21\\orie 4741\\dream-team\\data collection\\weekly_ff_elo_impute.csv",
+#                 delim = ",")
